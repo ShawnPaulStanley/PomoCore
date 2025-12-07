@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Music, Plus, Link as LinkIcon, Disc, LogIn } from 'lucide-react';
 
 const PRESETS = [
@@ -14,6 +14,15 @@ export const SpotifyPlayer: React.FC = () => {
   const [showInput, setShowInput] = useState(false);
   const [customInput, setCustomInput] = useState("");
   const [activePreset, setActivePreset] = useState<string>('Lofi Girl');
+  const [showLoginButton, setShowLoginButton] = useState(true);
+
+  useEffect(() => {
+    // Check if user has clicked the login button before
+    const hasClickedLogin = localStorage.getItem('spotifyLoginClicked');
+    if (hasClickedLogin === 'true') {
+      setShowLoginButton(false);
+    }
+  }, []);
 
   const handlePresetClick = (preset: typeof PRESETS[0]) => {
     setEmbedUrl(`https://open.spotify.com/embed/playlist/${preset.id}?utm_source=generator&theme=0`);
@@ -42,6 +51,10 @@ export const SpotifyPlayer: React.FC = () => {
   };
 
   const handleLogin = () => {
+    // Mark that user has clicked the login button
+    localStorage.setItem('spotifyLoginClicked', 'true');
+    setShowLoginButton(false);
+    
     // Opens Spotify login in a popup window
     const width = 450;
     const height = 730;
@@ -72,16 +85,18 @@ export const SpotifyPlayer: React.FC = () => {
       </div>
 
       {/* Login Helper - Centered */}
-      <div className="flex justify-center px-2 -mt-1">
-         <button 
-           onClick={handleLogin} 
-           className="text-[11px] bg-green-500 hover:bg-green-600 text-white px-3 py-1.5 rounded-full transition-colors flex items-center gap-1.5 font-semibold shadow-sm"
-           title="Login to Spotify is required for full song playback. Otherwise only 30s previews are available."
-         >
-           <LogIn size={12} />
-           <span>Login for Full Playback</span>
-         </button>
-      </div>
+      {showLoginButton && (
+        <div className="flex justify-center px-2 -mt-1">
+           <button 
+             onClick={handleLogin} 
+             className="text-[11px] bg-green-500 hover:bg-green-600 text-white px-3 py-1.5 rounded-full transition-colors flex items-center gap-1.5 font-semibold shadow-sm"
+             title="Login to Spotify is required for full song playback. Otherwise only 30s previews are available."
+           >
+             <LogIn size={12} />
+             <span>Login for Full Playback</span>
+           </button>
+        </div>
+      )}
 
       <div className="flex flex-wrap gap-2 items-center justify-center">
         {PRESETS.map((preset) => (
