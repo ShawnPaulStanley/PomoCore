@@ -189,7 +189,7 @@ export const Stats: React.FC<StatsProps> = ({ data }) => {
                   tickFormatter={formatDate}
                   axisLine={false} 
                   tickLine={false} 
-                  tick={{ fill: '#9CA3AF', fontFamily: 'Quicksand', fontSize: 12 }} 
+                  tick={{ fill: '#374151', fontFamily: 'Quicksand', fontSize: 12 }} 
                   interval={0}
                 />
                 <Tooltip 
@@ -210,7 +210,7 @@ export const Stats: React.FC<StatsProps> = ({ data }) => {
                   tickFormatter={formatDate}
                   axisLine={false} 
                   tickLine={false} 
-                  tick={{ fill: '#9CA3AF', fontFamily: 'Quicksand', fontSize: 12 }} 
+                  tick={{ fill: '#374151', fontFamily: 'Quicksand', fontSize: 12 }} 
                   padding={{ left: 10, right: 10 }}
                   interval={0}
                 />
