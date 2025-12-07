@@ -10,7 +10,7 @@ import { ScribbleBoard } from './components/ScribbleBoard';
 import { Auth } from './components/Auth';
 import { AppTheme, DailyStats } from './types';
 import { getTodayStats, updateStats, getStats } from './services/storage';
-import { supabase, getStreakData } from './services/supabase';
+import { supabase, getStreakData, getTodayFocusTime } from './services/supabase';
 
 function App() {
   const [darkMode, setDarkMode] = useState(false);
@@ -34,6 +34,7 @@ function App() {
   const [statsRefreshKey, setStatsRefreshKey] = useState(0);
   const [user, setUser] = useState<any>(null);
   const [currentStreak, setCurrentStreak] = useState(0);
+  const [todayFocusTime, setTodayFocusTime] = useState(0);
 
   // Initialize Data
   useEffect(() => {
@@ -67,7 +68,9 @@ function App() {
 
   const loadStreakData = async () => {
     const data = await getStreakData();
+    const todayTime = await getTodayFocusTime();
     setCurrentStreak(data.currentStreak);
+    setTodayFocusTime(todayTime);
   };
 
   useEffect(() => {
@@ -349,10 +352,10 @@ function App() {
                <div className="bg-purple-50 dark:bg-purple-900/30 p-6 rounded-3xl h-64 flex flex-col justify-center items-center text-center border-2 border-dashed border-purple-200 dark:border-purple-800">
                   <h3 className="font-hand text-xl mb-2 text-purple-900 dark:text-purple-100">Today's Focus</h3>
                   <div className="flex items-baseline gap-2">
-                    <p className="text-4xl font-hand font-bold text-purple-600 dark:text-purple-300">{Math.floor(todayStats.focusMinutes)}</p>
+                    <p className="text-4xl font-hand font-bold text-purple-600 dark:text-purple-300">{user ? todayFocusTime : Math.floor(todayStats.focusMinutes)}</p>
                     <span className="text-sm font-sans text-gray-500 uppercase font-bold tracking-widest">minutes</span>
                   </div>
-                  <p className="text-xs text-gray-400 font-sans mt-2">{todayStats.sessionsCompleted} sessions crushed</p>
+                  <p className="text-xs text-gray-400 font-sans mt-2">{user ? '' : `${todayStats.sessionsCompleted} sessions crushed`}</p>
                </div>
             </div>
           </div>

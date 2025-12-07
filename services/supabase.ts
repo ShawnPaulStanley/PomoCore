@@ -176,3 +176,22 @@ export const getWeeklyStats = async () => {
   const statsArray = Object.values(sessionsByDate);
   return statsArray.slice(-7);
 };
+
+export const getTodayFocusTime = async () => {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return 0;
+
+  const today = new Date().toISOString().split('T')[0];
+
+  const { data } = await supabase
+    .from('sessions')
+    .select('duration_minutes')
+    .eq('user_id', user.id)
+    .eq('mode', 'focus')
+    .gte('created_at', today)
+    .lt('created_at', new Date(new Date(today).getTime() + 86400000).toISOString());
+
+  if (!data) return 0;
+  
+  return data.reduce((total, session) => total + session.duration_minutes, 0);
+};
