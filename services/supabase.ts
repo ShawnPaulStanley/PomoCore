@@ -147,3 +147,32 @@ export const getTotalFocusTime = async () => {
   
   return data.reduce((total, session) => total + session.duration_minutes, 0);
 };
+
+export const getWeeklyStats = async () => {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return [];
+
+  const { data: sessions } = await supabase
+    .from('sessions')
+    .select('created_at, duration_minutes, mode')
+    .eq('user_id', user.id)
+    .order('created_at', { ascending: true });
+
+  if (!sessions || sessions.length === 0) return [];
+
+  // Group sessions by date
+  const sessionsByDate = sessions.reduce((acc: any, session) => {
+    const date = new Date(session.created_at).toISOString().split('T')[0];
+    if (!acc[date]) {
+      acc[date] = { date, focusMinutes: 0, tasksCompleted: 0 };
+    }
+    if (session.mode === 'focus') {
+      acc[date].focusMinutes += session.duration_minutes;
+    }
+    return acc;
+  }, {});
+
+  // Convert to array and get last 7 days
+  const statsArray = Object.values(sessionsByDate);
+  return statsArray.slice(-7);
+};

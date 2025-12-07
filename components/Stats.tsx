@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer, Cell, LineChart, Line } from 'recharts';
 import { BarChart2, TrendingUp, Target, Flame, Trophy } from 'lucide-react';
 import { DailyStats } from '../types';
-import { getStreakData, getTotalFocusTime, supabase } from '../services/supabase';
+import { getStreakData, getTotalFocusTime, getWeeklyStats, supabase } from '../services/supabase';
 
 interface StatsProps {
   data: DailyStats[];
@@ -13,6 +13,7 @@ export const Stats: React.FC<StatsProps> = ({ data }) => {
   const [user, setUser] = useState<any>(null);
   const [streakData, setStreakData] = useState({ currentStreak: 0, longestStreak: 0, totalSessions: 0 });
   const [totalFocusTime, setTotalFocusTime] = useState(0);
+  const [weeklyData, setWeeklyData] = useState<DailyStats[]>([]);
 
   useEffect(() => {
     // Check if user is logged in
@@ -30,14 +31,19 @@ export const Stats: React.FC<StatsProps> = ({ data }) => {
   useEffect(() => {
     if (user) {
       loadUserStats();
+    } else {
+      // Reset data when logged out
+      setWeeklyData([]);
     }
   }, [user]);
 
   const loadUserStats = async () => {
     const streaks = await getStreakData();
     const totalTime = await getTotalFocusTime();
+    const weekly = await getWeeklyStats();
     setStreakData(streaks);
     setTotalFocusTime(totalTime);
+    setWeeklyData(weekly as DailyStats[]);
   };
 
   // Format date for chart (e.g. "Mon" or "10/24")
@@ -47,11 +53,11 @@ export const Stats: React.FC<StatsProps> = ({ data }) => {
     return d.toLocaleDateString('en-US', { weekday: 'short' }); 
   };
 
-  // Prepare data: if empty, show last 7 days of zeros
-  let chartData: any[] = data;
+  // Use Supabase data if user is logged in, otherwise use localStorage data
+  let chartData: any[] = user ? weeklyData : data;
   
   // Basic filler if data is totally empty
-  if (data.length === 0) {
+  if (chartData.length === 0) {
       const today = new Date();
       chartData = Array.from({ length: 7 }, (_, i) => {
         const d = new Date(today);
@@ -65,7 +71,7 @@ export const Stats: React.FC<StatsProps> = ({ data }) => {
   } else {
     // Ensure we show at least a few bars if data exists but is sparse? 
     // For now, raw data is fine, but let's take last 7 entries max to keep chart clean
-    chartData = data.slice(-7);
+    chartData = chartData.slice(-7);
   }
 
 

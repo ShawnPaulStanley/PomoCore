@@ -30,6 +30,7 @@ function App() {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [showThemeMenu, setShowThemeMenu] = useState(false);
   const themeMenuRef = useRef<HTMLDivElement>(null);
+  const [statsRefreshKey, setStatsRefreshKey] = useState(0);
 
   // Initialize Data
   useEffect(() => {
@@ -89,6 +90,8 @@ function App() {
     const newStats = updateStats(minutes, 0, 1); // +Minutes, +0 Tasks, +1 Session
     setStatsData(newStats);
     setTodayStats(getTodayStats());
+    // Trigger stats refresh for Supabase data
+    setStatsRefreshKey(prev => prev + 1);
   };
 
   const handleTaskActivity = (completed: boolean) => {
@@ -309,7 +312,7 @@ function App() {
             
             <div className={`flex flex-col gap-6 transition-all duration-300 ${focusMode ? 'hidden opacity-0' : 'opacity-100'}`}>
                <Wellness />
-               <Stats data={statsData} />
+               <Stats data={statsData} key={statsRefreshKey} />
                <div className="bg-purple-50 dark:bg-purple-900/30 p-6 rounded-3xl h-64 flex flex-col justify-center items-center text-center border-2 border-dashed border-purple-200 dark:border-purple-800">
                   <h3 className="font-hand text-xl mb-2 text-purple-900 dark:text-purple-100">Today's Focus</h3>
                   <div className="flex items-baseline gap-2">
