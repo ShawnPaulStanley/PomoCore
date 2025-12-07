@@ -31,6 +31,13 @@ export const Stats: React.FC<StatsProps> = ({ data }) => {
   useEffect(() => {
     if (user) {
       loadUserStats();
+      
+      // Reload stats every minute to catch day changes
+      const interval = setInterval(() => {
+        loadUserStats();
+      }, 60000); // Check every minute
+      
+      return () => clearInterval(interval);
     } else {
       // Reset data when logged out
       setWeeklyData([]);
