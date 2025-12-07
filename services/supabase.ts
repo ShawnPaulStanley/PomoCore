@@ -152,47 +152,36 @@ export const getWeeklyStats = async () => {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return [];
 
-  // Calculate the date 7 days ago
+  // Calculate the date 6 days ago from today
   const today = new Date();
-  const sevenDaysAgo = new Date(today);
-  sevenDaysAgo.setDate(today.getDate() - 6);
-  sevenDaysAgo.setHours(0, 0, 0, 0);
+  today.setHours(0, 0, 0, 0);
+  
+  const sixDaysAgo = new Date(today);
+  sixDaysAgo.setDate(today.getDate() - 6);
 
   const { data: sessions } = await supabase
     .from('sessions')
     .select('created_at, duration_minutes, mode')
     .eq('user_id', user.id)
-    .gte('created_at', sevenDaysAgo.toISOString())
+    .gte('created_at', sixDaysAgo.toISOString())
     .order('created_at', { ascending: true });
 
-  if (!sessions || sessions.length === 0) {
-    // Return last 7 days with zero data
-    const emptyStats = [];
-    for (let i = 6; i >= 0; i--) {
-      const d = new Date(today);
-      d.setDate(today.getDate() - i);
-      emptyStats.push({
-        date: d.toISOString().split('T')[0],
-        focusMinutes: 0,
-        tasksCompleted: 0
-      });
-    }
-    return emptyStats;
+  // Group sessions by date
+  const sessionsByDate: any = {};
+  
+  if (sessions && sessions.length > 0) {
+    sessions.forEach(session => {
+      const date = new Date(session.created_at).toISOString().split('T')[0];
+      if (!sessionsByDate[date]) {
+        sessionsByDate[date] = { date, focusMinutes: 0, tasksCompleted: 0 };
+      }
+      if (session.mode === 'focus') {
+        sessionsByDate[date].focusMinutes += session.duration_minutes;
+      }
+    });
   }
 
-  // Group sessions by date
-  const sessionsByDate = sessions.reduce((acc: any, session) => {
-    const date = new Date(session.created_at).toISOString().split('T')[0];
-    if (!acc[date]) {
-      acc[date] = { date, focusMinutes: 0, tasksCompleted: 0 };
-    }
-    if (session.mode === 'focus') {
-      acc[date].focusMinutes += session.duration_minutes;
-    }
-    return acc;
-  }, {});
-
-  // Fill in missing days with zero data for the last 7 days
+  // Fill in all 7 days (6 days ago through today)
   const filledStats = [];
   for (let i = 6; i >= 0; i--) {
     const d = new Date(today);
