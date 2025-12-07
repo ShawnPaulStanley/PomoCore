@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Music, Plus, Link as LinkIcon, Disc, LogIn, RotateCcw } from 'lucide-react';
-import { supabase } from '../services/supabase';
+import { Music, Plus, Link as LinkIcon, Disc, LogIn, RefreshCw, Eye } from 'lucide-react';
 
 const PRESETS = [
   { name: 'Lofi Girl', id: '0vvXsWCC9xrXsKd4FyS8kM' },
@@ -16,56 +15,14 @@ export const SpotifyPlayer: React.FC = () => {
   const [customInput, setCustomInput] = useState("");
   const [activePreset, setActivePreset] = useState<string>('Lofi Girl');
   const [showLoginButton, setShowLoginButton] = useState(true);
-  const [user, setUser] = useState<any>(null);
-  const [hasClickedLogin, setHasClickedLogin] = useState(false);
 
   useEffect(() => {
-    loadLoginPreference();
-    
-    // Check if user is logged in to PomoCore
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
-    });
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-      if (!session?.user) {
-        // Reset when user signs out
-        setHasClickedLogin(false);
-        setShowLoginButton(true);
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
-
-  const loadLoginPreference = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
-
-    const { data } = await supabase
-      .from('user_preferences')
-      .select('spotify_login_clicked')
-      .eq('user_id', user.id)
-      .single();
-
-    if (data?.spotify_login_clicked) {
-      setHasClickedLogin(true);
+    // Check localStorage for button visibility preference
+    const hideButton = localStorage.getItem('hideSpotifyLogin');
+    if (hideButton === 'true') {
       setShowLoginButton(false);
     }
-  };
-
-  const saveLoginPreference = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) return;
-
-    await supabase
-      .from('user_preferences')
-      .upsert({
-        user_id: user.id,
-        spotify_login_clicked: true
-      });
-  };
+  }, []);
 
   const handlePresetClick = (preset: typeof PRESETS[0]) => {
     setEmbedUrl(`https://open.spotify.com/embed/playlist/${preset.id}?utm_source=generator&theme=0`);
@@ -94,10 +51,6 @@ export const SpotifyPlayer: React.FC = () => {
   };
 
   const handleLogin = () => {
-    setShowLoginButton(false);
-    setHasClickedLogin(true);
-    saveLoginPreference();
-    
     // Opens Spotify login in a popup window
     const width = 450;
     const height = 730;
@@ -108,10 +61,15 @@ export const SpotifyPlayer: React.FC = () => {
       'Spotify Login', 
       `width=${width},height=${height},top=${top},left=${left}`
     );
+    
+    // Hide the button after first click
+    setShowLoginButton(false);
+    localStorage.setItem('hideSpotifyLogin', 'true');
   };
 
-  const handleShowLoginButton = () => {
+  const handleShowLogin = () => {
     setShowLoginButton(true);
+    localStorage.setItem('hideSpotifyLogin', 'false');
   };
 
   return (
@@ -132,29 +90,26 @@ export const SpotifyPlayer: React.FC = () => {
       </div>
 
       {/* Login Helper - Centered */}
-      {showLoginButton ? (
-        <div className="flex justify-center px-2 -mt-1">
-           <button 
-             onClick={handleLogin} 
-             className="text-[11px] bg-green-500 hover:bg-green-600 text-white px-3 py-1.5 rounded-full transition-colors flex items-center gap-1.5 font-semibold shadow-sm"
-             title="Login to Spotify is required for full song playback. Otherwise only 30s previews are available."
-           >
-             <LogIn size={12} />
-             <span>Login for Full Playback</span>
-           </button>
-        </div>
-      ) : hasClickedLogin && user && (
-        <div className="flex justify-center px-2 -mt-1">
-           <button 
-             onClick={handleShowLoginButton} 
-             className="text-[10px] text-gray-400 hover:text-green-500 transition-colors flex items-center gap-1 font-sans opacity-60 hover:opacity-100"
-             title="Show Spotify login button again"
-           >
-             <RotateCcw size={10} />
-             <span>Show Login Button</span>
-           </button>
-        </div>
-      )}
+      <div className="flex justify-center px-2 -mt-1">
+        {showLoginButton ? (
+          <button 
+            onClick={handleLogin} 
+            className="text-[11px] bg-green-500 hover:bg-green-600 text-white px-3 py-1.5 rounded-full transition-colors flex items-center gap-1.5 font-semibold shadow-sm"
+            title="Login to Spotify is required for full song playback. Otherwise only 30s previews are available."
+          >
+            <LogIn size={12} />
+            <span>Login for Full Playback</span>
+          </button>
+        ) : (
+          <button
+            onClick={handleShowLogin}
+            className="text-[10px] bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-300 p-1.5 rounded-full transition-colors"
+            title="Show Spotify login button"
+          >
+            <Eye size={12} />
+          </button>
+        )}
+      </div>
 
       <div className="flex flex-wrap gap-2 items-center justify-center">
         {PRESETS.map((preset) => (
