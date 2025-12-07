@@ -41,6 +41,7 @@ export const Stats: React.FC<StatsProps> = ({ data }) => {
     const streaks = await getStreakData();
     const totalTime = await getTotalFocusTime();
     const weekly = await getWeeklyStats();
+    console.log('Weekly stats loaded:', weekly);
     setStreakData(streaks);
     setTotalFocusTime(totalTime);
     setWeeklyData(weekly as DailyStats[]);
@@ -55,6 +56,8 @@ export const Stats: React.FC<StatsProps> = ({ data }) => {
 
   // Use Supabase data if user is logged in, otherwise use localStorage data
   let chartData: any[] = user ? weeklyData : data;
+  
+  console.log('Chart data:', chartData, 'User:', !!user, 'Weekly data:', weeklyData);
   
   // Basic filler if data is totally empty
   if (chartData.length === 0) {
