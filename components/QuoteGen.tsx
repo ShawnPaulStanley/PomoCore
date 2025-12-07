@@ -1,26 +1,25 @@
-import React, { useState, useEffect } from 'react';
-import { Cat, Sparkles, RefreshCw, Copy, Check } from 'lucide-react';
+import React, { useState } from 'react';
+import { Cat, Sparkles, Copy, Check } from 'lucide-react';
 import { generateQuote } from '../services/geminiService';
 import { Quote } from '../types';
 
 export const QuoteGen: React.FC = () => {
-  const [quote, setQuote] = useState<Quote>({ text: "Loading vibes...", author: "" });
-  const [loading, setLoading] = useState(false);
+  const [quote, setQuote] = useState<Quote>({ text: "Breathe in, breathe out. You got this.", author: "PomoCore" });
   const [meowMode, setMeowMode] = useState(false);
   const [copied, setCopied] = useState(false);
 
   const fetchNewQuote = async () => {
-    setLoading(true);
     setCopied(false);
     const newQuote = await generateQuote(meowMode);
     setQuote(newQuote);
-    setLoading(false);
   };
 
-  useEffect(() => {
-    fetchNewQuote();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [meowMode]);
+  const toggleMeowMode = async () => {
+    const newMode = !meowMode;
+    setMeowMode(newMode);
+    const newQuote = await generateQuote(newMode);
+    setQuote(newQuote);
+  };
 
   const handleCopy = () => {
     navigator.clipboard.writeText(`"${quote.text}" — ${quote.author}`);
@@ -43,7 +42,7 @@ export const QuoteGen: React.FC = () => {
             </button>
          </div>
          <button 
-          onClick={() => setMeowMode(!meowMode)}
+          onClick={toggleMeowMode}
           className={`px-3 py-1 rounded-full text-xs font-bold transition-all flex items-center gap-1 ${meowMode ? 'bg-orange-100 text-orange-800 border border-orange-200' : 'bg-gray-100 dark:bg-gray-700 text-gray-400 hover:bg-gray-200 border border-transparent'}`}
           title="Toggle Meow Mode"
         >
@@ -54,32 +53,24 @@ export const QuoteGen: React.FC = () => {
 
       {/* Quote Display */}
       <div className="min-h-[100px] flex items-center justify-center w-full px-2">
-        {loading ? (
-          <div className="flex flex-col items-center gap-2 text-pastel-lavender animate-pulse">
-             <RefreshCw className="animate-spin" size={24} />
-             <span className="text-xs font-bold tracking-widest uppercase">Fetching Vibes...</span>
-          </div>
-        ) : (
-          <div className="animate-[slideUpFade_0.5s_ease-out]">
-             <p className={`font-hand text-2xl md:text-3xl mb-3 text-gray-700 dark:text-gray-200 leading-snug ${meowMode ? "italic" : ""}`}>
-               "{quote.text}"
-             </p>
-             <div className="flex items-center justify-center gap-2">
-               <span className="h-[1px] w-8 bg-pastel-peach"></span>
-               <p className="text-xs text-gray-500 font-sans uppercase tracking-widest font-bold">{quote.author}</p>
-               <span className="h-[1px] w-8 bg-pastel-peach"></span>
-             </div>
-          </div>
-        )}
+        <div className="animate-[slideUpFade_0.5s_ease-out]">
+           <p className={`font-hand text-2xl md:text-3xl mb-3 text-gray-700 dark:text-gray-200 leading-snug ${meowMode ? "italic" : ""}`}>
+             "{quote.text}"
+           </p>
+           <div className="flex items-center justify-center gap-2">
+             <span className="h-[1px] w-8 bg-pastel-peach"></span>
+             <p className="text-xs text-gray-500 font-sans uppercase tracking-widest font-bold">{quote.author}</p>
+             <span className="h-[1px] w-8 bg-pastel-peach"></span>
+           </div>
+        </div>
       </div>
 
       {/* Footer Action */}
       <button 
         onClick={fetchNewQuote}
-        disabled={loading}
         className="mt-6 text-xs font-bold text-gray-400 hover:text-pastel-peach flex items-center gap-1.5 transition-colors uppercase tracking-widest group-hover:translate-y-0 translate-y-2 opacity-0 group-hover:opacity-100 duration-300"
       >
-        <Sparkles size={14} className={loading ? "animate-spin" : ""} /> 
+        <Sparkles size={14} /> 
         Generate New Vibe
       </button>
     </div>
