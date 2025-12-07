@@ -41,7 +41,7 @@ export const Stats: React.FC<StatsProps> = ({ data }) => {
     const streaks = await getStreakData();
     const totalTime = await getTotalFocusTime();
     const weekly = await getWeeklyStats();
-    console.log('Weekly stats loaded:', weekly);
+    console.log('Weekly stats loaded:', JSON.stringify(weekly, null, 2));
     setStreakData(streaks);
     setTotalFocusTime(totalTime);
     setWeeklyData(weekly as DailyStats[]);
@@ -57,7 +57,28 @@ export const Stats: React.FC<StatsProps> = ({ data }) => {
   // Use Supabase data if user is logged in, otherwise use localStorage data
   let chartData: any[] = user ? weeklyData : data;
   
-  console.log('Chart data:', chartData, 'User:', !!user, 'Weekly data:', weeklyData);
+  console.log('Chart data:', JSON.stringify(chartData, null, 2), 'User:', !!user, 'Weekly data length:', weeklyData.length);
+  
+  // Fill with last 7 days if we have some data but not enough
+  if (chartData.length > 0 && chartData.length < 7) {
+    const today = new Date();
+    const filledData = [];
+    
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(today);
+      d.setDate(d.getDate() - i);
+      const dateStr = d.toISOString().split('T')[0];
+      
+      const existingData = chartData.find(item => item.date === dateStr);
+      filledData.push(existingData || {
+        date: dateStr,
+        focusMinutes: 0,
+        tasksCompleted: 0
+      });
+    }
+    
+    chartData = filledData;
+  }
   
   // Basic filler if data is totally empty
   if (chartData.length === 0) {
