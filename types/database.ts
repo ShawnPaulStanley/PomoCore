@@ -6,7 +6,7 @@ export type Json =
   | { [key: string]: Json | undefined }
   | Json[]
 
-export interface Database {
+export type Database = {
   public: {
     Tables: {
       sessions: {
@@ -31,6 +31,7 @@ export interface Database {
           duration_minutes?: number
           mode?: string
         }
+        Relationships: []
       }
       tasks: {
         Row: {
@@ -57,7 +58,20 @@ export interface Database {
           completed?: boolean
           completed_at?: string | null
         }
+        Relationships: []
       }
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      [_ in never]: never
+    }
+    Enums: {
+      [_ in never]: never
+    }
+    CompositeTypes: {
+      [_ in never]: never
     }
   }
 }

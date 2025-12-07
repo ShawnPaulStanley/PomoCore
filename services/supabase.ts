@@ -1,3 +1,4 @@
+/// <reference types="vite/client" />
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from '../types/database';
 
@@ -38,11 +39,13 @@ export const saveSession = async (duration: number, mode: string) => {
 
   const { data, error } = await supabase
     .from('sessions')
-    .insert({
-      user_id: user.id,
-      duration_minutes: duration,
-      mode: mode,
-    })
+    .insert([
+      {
+        user_id: user.id,
+        duration_minutes: duration,
+        mode: mode,
+      }
+    ])
     .select()
     .single();
 
