@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Music, Plus, Link as LinkIcon, Disc, LogIn } from 'lucide-react';
+import { supabase } from '../services/supabase';
 
 const PRESETS = [
   { name: 'Lofi Girl', id: '0vvXsWCC9xrXsKd4FyS8kM' },
@@ -15,13 +16,28 @@ export const SpotifyPlayer: React.FC = () => {
   const [customInput, setCustomInput] = useState("");
   const [activePreset, setActivePreset] = useState<string>('Lofi Girl');
   const [showLoginButton, setShowLoginButton] = useState(true);
+  const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
-    // Check if user has clicked the login button before
-    const hasClickedLogin = localStorage.getItem('spotifyLoginClicked');
-    if (hasClickedLogin === 'true') {
-      setShowLoginButton(false);
-    }
+    // Check if user is logged in to PomoCore
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+      // Hide button if user is signed in (assumes they've logged into Spotify)
+      if (session?.user) {
+        setShowLoginButton(false);
+      }
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+      if (session?.user) {
+        setShowLoginButton(false);
+      } else {
+        setShowLoginButton(true);
+      }
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
   const handlePresetClick = (preset: typeof PRESETS[0]) => {
@@ -51,10 +67,6 @@ export const SpotifyPlayer: React.FC = () => {
   };
 
   const handleLogin = () => {
-    // Mark that user has clicked the login button
-    localStorage.setItem('spotifyLoginClicked', 'true');
-    setShowLoginButton(false);
-    
     // Opens Spotify login in a popup window
     const width = 450;
     const height = 730;
