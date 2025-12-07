@@ -155,7 +155,7 @@ export const Stats: React.FC<StatsProps> = ({ data }) => {
             <div className="h-full flex items-center justify-center text-gray-400 font-hand text-lg opacity-60">
               Sign in to see your stats!
             </div>
-          ) : chartData.every(d => d.focusMinutes === 0) ? (
+          ) : chartData.length === 0 ? (
               <div className="h-full flex items-center justify-center text-gray-400 font-hand text-lg opacity-60">
                   No data yet. Start a timer!
               </div>
