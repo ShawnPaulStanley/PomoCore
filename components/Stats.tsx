@@ -171,7 +171,7 @@ export const Stats: React.FC<StatsProps> = ({ data }) => {
           </div>
         </div>
 
-        <div className="w-full min-h-[160px]">
+        <div className="w-full h-[200px]">
           {!user ? (
             <div className="h-full flex items-center justify-center text-gray-400 font-hand text-lg opacity-60">
               Sign in to see your stats!
