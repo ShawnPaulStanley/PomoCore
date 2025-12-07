@@ -47,11 +47,14 @@ export const Stats: React.FC<StatsProps> = ({ data }) => {
     setWeeklyData(weekly as DailyStats[]);
   };
 
-  // Format date for chart (e.g. "Mon" or "10/24")
+  // Format date for chart in DD/MM/YYYY format
   const formatDate = (dateStr: string) => {
     if (!dateStr) return '';
-    const d = new Date(dateStr);
-    return d.toLocaleDateString('en-US', { weekday: 'short' }); 
+    const d = new Date(dateStr + 'T00:00:00');
+    const day = String(d.getDate()).padStart(2, '0');
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const year = d.getFullYear();
+    return `${day}/${month}/${year}`;
   };
 
   // Use Supabase data if user is logged in, otherwise use localStorage data

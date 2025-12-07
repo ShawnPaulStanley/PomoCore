@@ -152,13 +152,33 @@ export const getWeeklyStats = async () => {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return [];
 
+  // Calculate the date 7 days ago
+  const today = new Date();
+  const sevenDaysAgo = new Date(today);
+  sevenDaysAgo.setDate(today.getDate() - 6);
+  sevenDaysAgo.setHours(0, 0, 0, 0);
+
   const { data: sessions } = await supabase
     .from('sessions')
     .select('created_at, duration_minutes, mode')
     .eq('user_id', user.id)
+    .gte('created_at', sevenDaysAgo.toISOString())
     .order('created_at', { ascending: true });
 
-  if (!sessions || sessions.length === 0) return [];
+  if (!sessions || sessions.length === 0) {
+    // Return last 7 days with zero data
+    const emptyStats = [];
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(today);
+      d.setDate(today.getDate() - i);
+      emptyStats.push({
+        date: d.toISOString().split('T')[0],
+        focusMinutes: 0,
+        tasksCompleted: 0
+      });
+    }
+    return emptyStats;
+  }
 
   // Group sessions by date
   const sessionsByDate = sessions.reduce((acc: any, session) => {
@@ -172,9 +192,21 @@ export const getWeeklyStats = async () => {
     return acc;
   }, {});
 
-  // Convert to array and get last 7 days
-  const statsArray = Object.values(sessionsByDate);
-  return statsArray.slice(-7);
+  // Fill in missing days with zero data for the last 7 days
+  const filledStats = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(today);
+    d.setDate(today.getDate() - i);
+    const dateStr = d.toISOString().split('T')[0];
+    
+    filledStats.push(sessionsByDate[dateStr] || {
+      date: dateStr,
+      focusMinutes: 0,
+      tasksCompleted: 0
+    });
+  }
+
+  return filledStats;
 };
 
 export const getTodayFocusTime = async () => {
