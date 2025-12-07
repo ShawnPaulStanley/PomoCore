@@ -75,10 +75,10 @@ export const SpotifyPlayer: React.FC = () => {
       <div className="flex justify-center px-2 -mt-1">
          <button 
            onClick={handleLogin} 
-           className="text-[10px] text-gray-400 hover:text-green-500 transition-colors flex items-center gap-1 font-sans opacity-70 hover:opacity-100"
+           className="text-[11px] bg-green-500 hover:bg-green-600 text-white px-3 py-1.5 rounded-full transition-colors flex items-center gap-1.5 font-semibold shadow-sm"
            title="Login to Spotify is required for full song playback. Otherwise only 30s previews are available."
          >
-           <LogIn size={10} />
+           <LogIn size={12} />
            <span>Login for Full Playback</span>
          </button>
       </div>
