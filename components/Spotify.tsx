@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Music, Plus, Link as LinkIcon, Disc, LogIn } from 'lucide-react';
+import { Music, Plus, Link as LinkIcon, Disc, LogIn, X } from 'lucide-react';
 import { supabase } from '../services/supabase';
 
 const PRESETS = [
@@ -22,16 +22,15 @@ export const SpotifyPlayer: React.FC = () => {
     // Check if user is logged in to PomoCore
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
-      // Hide button if user is signed in (assumes they've logged into Spotify)
       if (session?.user) {
-        setShowLoginButton(false);
+        loadButtonPreference(session.user.id);
       }
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
       if (session?.user) {
-        setShowLoginButton(false);
+        loadButtonPreference(session.user.id);
       } else {
         setShowLoginButton(true);
       }
@@ -39,6 +38,34 @@ export const SpotifyPlayer: React.FC = () => {
 
     return () => subscription.unsubscribe();
   }, []);
+
+  const loadButtonPreference = async (userId: string) => {
+    const { data } = await supabase
+      .from('user_preferences')
+      .select('hide_spotify_login')
+      .eq('user_id', userId)
+      .single();
+    
+    if (data) {
+      setShowLoginButton(!data.hide_spotify_login);
+    }
+  };
+
+  const handleHideButton = async () => {
+    if (!user) return;
+
+    setShowLoginButton(false);
+    
+    // Save preference to Supabase
+    await supabase
+      .from('user_preferences')
+      .upsert({
+        user_id: user.id,
+        hide_spotify_login: true
+      }, {
+        onConflict: 'user_id'
+      });
+  };
 
   const handlePresetClick = (preset: typeof PRESETS[0]) => {
     setEmbedUrl(`https://open.spotify.com/embed/playlist/${preset.id}?utm_source=generator&theme=0`);
@@ -98,7 +125,7 @@ export const SpotifyPlayer: React.FC = () => {
 
       {/* Login Helper - Centered */}
       {showLoginButton && (
-        <div className="flex justify-center px-2 -mt-1">
+        <div className="flex justify-center items-center gap-2 px-2 -mt-1">
            <button 
              onClick={handleLogin} 
              className="text-[11px] bg-green-500 hover:bg-green-600 text-white px-3 py-1.5 rounded-full transition-colors flex items-center gap-1.5 font-semibold shadow-sm"
@@ -107,6 +134,15 @@ export const SpotifyPlayer: React.FC = () => {
              <LogIn size={12} />
              <span>Login for Full Playback</span>
            </button>
+           {user && (
+             <button
+               onClick={handleHideButton}
+               className="text-[11px] bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-300 p-1.5 rounded-full transition-colors"
+               title="Hide this button"
+             >
+               <X size={12} />
+             </button>
+           )}
         </div>
       )}
 
