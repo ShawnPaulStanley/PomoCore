@@ -152,12 +152,17 @@ export const getWeeklyStats = async () => {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return [];
 
-  // Calculate the date 6 days ago from today
+  // Get today's date in local timezone
   const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  const year = today.getFullYear();
+  const month = today.getMonth();
+  const date = today.getDate();
   
-  const sixDaysAgo = new Date(today);
-  sixDaysAgo.setDate(today.getDate() - 6);
+  // Create date at midnight local time
+  const todayLocal = new Date(year, month, date);
+  
+  // Calculate 6 days ago
+  const sixDaysAgo = new Date(year, month, date - 6);
 
   const { data: sessions } = await supabase
     .from('sessions')
@@ -171,12 +176,15 @@ export const getWeeklyStats = async () => {
   
   if (sessions && sessions.length > 0) {
     sessions.forEach(session => {
-      const date = new Date(session.created_at).toISOString().split('T')[0];
-      if (!sessionsByDate[date]) {
-        sessionsByDate[date] = { date, focusMinutes: 0, tasksCompleted: 0 };
+      // Convert to local date string
+      const sessionDate = new Date(session.created_at);
+      const dateStr = `${sessionDate.getFullYear()}-${String(sessionDate.getMonth() + 1).padStart(2, '0')}-${String(sessionDate.getDate()).padStart(2, '0')}`;
+      
+      if (!sessionsByDate[dateStr]) {
+        sessionsByDate[dateStr] = { date: dateStr, focusMinutes: 0, tasksCompleted: 0 };
       }
       if (session.mode === 'focus') {
-        sessionsByDate[date].focusMinutes += session.duration_minutes;
+        sessionsByDate[dateStr].focusMinutes += session.duration_minutes;
       }
     });
   }
@@ -184,9 +192,8 @@ export const getWeeklyStats = async () => {
   // Fill in all 7 days (6 days ago through today)
   const filledStats = [];
   for (let i = 6; i >= 0; i--) {
-    const d = new Date(today);
-    d.setDate(today.getDate() - i);
-    const dateStr = d.toISOString().split('T')[0];
+    const d = new Date(year, month, date - i);
+    const dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
     
     filledStats.push(sessionsByDate[dateStr] || {
       date: dateStr,
