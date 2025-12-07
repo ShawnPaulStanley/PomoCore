@@ -215,8 +215,6 @@ function App() {
 
         {/* Right Controls */}
         <div className="absolute top-6 right-6 flex items-center gap-3 z-40">
-          <Auth />
-          
           <button
             onClick={() => setFocusMode(!focusMode)}
             className={`flex items-center gap-2 px-3 py-1 rounded-full text-sm font-bold transition-all ${focusMode ? 'bg-pastel-peach text-white shadow-md scale-105' : 'bg-white dark:bg-gray-800 opacity-90 hover:opacity-100 border border-gray-200 dark:border-gray-700'}`}
@@ -274,6 +272,8 @@ function App() {
           >
             {darkMode ? <Sun size={20} /> : <Moon size={20} />}
           </button>
+
+          <Auth />
         </div>
 
         {/* Centered Title - Only appears after startup animation swaps */}
