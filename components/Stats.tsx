@@ -76,29 +76,8 @@ export const Stats: React.FC<StatsProps> = ({ data }) => {
   
   console.log('Chart data:', JSON.stringify(chartData, null, 2), 'User:', !!user, 'Weekly data length:', weeklyData.length);
   
-  // Fill with last 7 days if we have some data but not enough
-  if (chartData.length > 0 && chartData.length < 7) {
-    const today = new Date();
-    const filledData = [];
-    
-    for (let i = 6; i >= 0; i--) {
-      const d = new Date(today);
-      d.setDate(d.getDate() - i);
-      const dateStr = d.toISOString().split('T')[0];
-      
-      const existingData = chartData.find(item => item.date === dateStr);
-      filledData.push(existingData || {
-        date: dateStr,
-        focusMinutes: 0,
-        tasksCompleted: 0
-      });
-    }
-    
-    chartData = filledData;
-  }
-  
-  // Basic filler if data is totally empty
-  if (chartData.length === 0) {
+  // Basic filler if data is totally empty (not logged in)
+  if (!user && chartData.length === 0) {
       const today = new Date();
       chartData = Array.from({ length: 7 }, (_, i) => {
         const d = new Date(today);
@@ -109,10 +88,6 @@ export const Stats: React.FC<StatsProps> = ({ data }) => {
            tasksCompleted: 0
         };
       });
-  } else {
-    // Ensure we show at least a few bars if data exists but is sparse? 
-    // For now, raw data is fine, but let's take last 7 entries max to keep chart clean
-    chartData = chartData.slice(-7);
   }
 
 
