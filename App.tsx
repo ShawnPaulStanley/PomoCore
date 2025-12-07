@@ -10,6 +10,7 @@ import { ScribbleBoard } from './components/ScribbleBoard';
 import { Auth } from './components/Auth';
 import { AppTheme, DailyStats } from './types';
 import { getTodayStats, updateStats, getStats } from './services/storage';
+import { supabase, getStreakData } from './services/supabase';
 
 function App() {
   const [darkMode, setDarkMode] = useState(false);
@@ -31,6 +32,8 @@ function App() {
   const [showThemeMenu, setShowThemeMenu] = useState(false);
   const themeMenuRef = useRef<HTMLDivElement>(null);
   const [statsRefreshKey, setStatsRefreshKey] = useState(0);
+  const [user, setUser] = useState<any>(null);
+  const [currentStreak, setCurrentStreak] = useState(0);
 
   // Initialize Data
   useEffect(() => {
@@ -40,6 +43,32 @@ function App() {
     };
     loadData();
   }, []);
+
+  // Auth listener
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+      if (session?.user) {
+        loadStreakData();
+      }
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+      if (session?.user) {
+        loadStreakData();
+      } else {
+        setCurrentStreak(0);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const loadStreakData = async () => {
+    const data = await getStreakData();
+    setCurrentStreak(data.currentStreak);
+  };
 
   useEffect(() => {
     if (darkMode) {
@@ -92,6 +121,10 @@ function App() {
     setTodayStats(getTodayStats());
     // Trigger stats refresh for Supabase data
     setStatsRefreshKey(prev => prev + 1);
+    // Reload streak data
+    if (user) {
+      loadStreakData();
+    }
   };
 
   const handleTaskActivity = (completed: boolean) => {
@@ -228,7 +261,7 @@ function App() {
             </button>
 
             <div className="hidden md:flex items-center gap-2 mr-2 text-sm font-bold opacity-90 bg-white dark:bg-gray-800 px-3 py-1 rounded-full border border-gray-200 dark:border-gray-700">
-              <span>{Math.floor(todayStats.focusMinutes)}m</span>
+              <span>{currentStreak}</span>
               <Flame size={14} className="text-pastel-peach" />
             </div>
             
