@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PomoCore</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'><path fill='%23FFB6C1' d='M223.45,73.52a44,44,0,0,0-62.27.08L128,107.19,94.82,73.6A44,44,0,0,0,32.55,136L128,231.42,223.45,136A44.06,44.06,0,0,0,223.45,73.52ZM212,124.52,128,208.52,44,124.52a28,28,0,0,1,39.8-39.59l.11.11,36.68,36.69a8,8,0,0,0,11.31,0l36.68-36.69.11-.11A28,28,0,1,1,212,124.52Z'/></svg>">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&family=Quicksand:wght@300;400;500;600;700&family=Indie+Flower&family=Schoolbell&family=Chewy&display=swap" rel="stylesheet">
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+        theme: {
+          extend: {
+            fontFamily: {
+              hand: ['"Patrick Hand"', 'cursive'],
+              sans: ['"Quicksand"', 'sans-serif'],
+              title: ['"Schoolbell"', 'cursive'],
+            },
+            colors: {
+              pastel: {
+                lavender: '#E6E6FA',
+                peach: '#FFDAB9',
+                mint: '#E0F2F1',
+                cream: '#FDFBF7',
+                blue: '#E0F7FA',
+                text: '#4A4A4A',
+                darkText: '#F5F5F5',
+                darkBg: '#1a1a2e',
+                darkCard: '#16213e'
+              }
+            },
+            animation: {
+              'float': 'float 6s ease-in-out infinite',
+              'breathe': 'breathe 4s ease-in-out infinite',
+              'expand': 'expand 20s infinite',
+              'fill': 'fill 2s ease-out forwards',
+              'stamp': 'stamp 0.5s cubic-bezier(0.6, 0.04, 0.98, 0.335) forwards',
+              'shake': 'shake 0.82s cubic-bezier(.36,.07,.19,.97) both',
+              'slideUpFade': 'slideUpFade 0.5s ease-out forwards',
+              'popIn': 'popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards',
+              'slideInRight': 'slideInRight 0.5s ease-out forwards',
+              'slideInLeft': 'slideInLeft 0.5s ease-out forwards',
+              'bounceIn': 'bounceIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards',
+            },
+            keyframes: {
+              float: {
+                '0%, 100%': { transform: 'translateY(0)' },
+                '50%': { transform: 'translateY(-10px)' },
+              },
+              breathe: {
+                '0%, 100%': { transform: 'scale(1)' },
+                '50%': { transform: 'scale(1.02)' },
+              },
+              expand: {
+                '0%, 100%': { transform: 'scale(1)' },
+                '50%': { transform: 'scale(1.1)' },
+              },
+              fill: {
+                '0%': { height: '0%' },
+                '100%': { height: 'var(--target-height)' },
+              },
+              slideUpFade: {
+                '0%': { transform: 'translateY(20px)', opacity: '0' },
+                '100%': { transform: 'translateY(0)', opacity: '1' },
+              },
+              bounceIn: {
+                '0%': { transform: 'scale(0)', opacity: '0' },
+                '60%': { transform: 'scale(1.1)', opacity: '1' },
+                '100%': { transform: 'scale(1)', opacity: '1' },
+              },
+              popIn: {
+                '0%': { transform: 'scale(0) rotate(-45deg)', opacity: '0' },
+                '80%': { transform: 'scale(1.2) rotate(10deg)', opacity: '1' },
+                '100%': { transform: 'scale(1) rotate(0deg)', opacity: '1' },
+              },
+              slideInRight: {
+                 '0%': { transform: 'translateX(50px)', opacity: '0' },
+                 '100%': { transform: 'translateX(0)', opacity: '1' },
+              },
+              slideInLeft: {
+                 '0%': { transform: 'translateX(-50px)', opacity: '0' },
+                 '100%': { transform: 'translateX(0)', opacity: '1' },
+              },
+              stamp: {
+                '0%': { opacity: '0', transform: 'scale(4)' },
+                '100%': { opacity: '1', transform: 'scale(1)' }
+              },
+              shake: {
+                '10%, 90%': { transform: 'translate3d(-1px, 0, 0)' },
+                '20%, 80%': { transform: 'translate3d(2px, 0, 0)' },
+                '30%, 50%, 70%': { transform: 'translate3d(-4px, 0, 0)' },
+                '40%, 60%': { transform: 'translate3d(4px, 0, 0)' }
+              }
+            }
+          },
+        },
+      }
+    </script>
+    <style>
+      body {
+        font-family: 'Quicksand', sans-serif;
+        /* Star Cursor */
+        cursor: url("data:image/svg+xml,%3Csvg width='32' height='32' viewBox='0 0 32 32' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M16 2L19 12L29 16L19 20L16 30L13 20L3 16L13 12L16 2Z' fill='%23FFDAB9' stroke='%234A4A4A' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E") 16 16, auto;
+      }
+      
+      /* Hover State Cursor - Larger Star */
+      button, a, input, [role="button"], select, label {
+        cursor: url("data:image/svg+xml,%3Csvg width='32' height='32' viewBox='0 0 32 32' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M16 0L20.5 11.5L32 16L20.5 20.5L16 32L11.5 20.5L0 16L11.5 11.5L16 0Z' fill='%23E6E6FA' stroke='%234A4A4A' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E") 16 16, pointer;
+      }
+
+      .handwriting {
+        font-family: 'Patrick Hand', cursive;
+      }
+      /* Custom Scrollbar */
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+      }
+      
+      .paper-pattern {
+        background-color: #F0EEE5; /* Darker parchment color */
+        background-image: radial-gradient(#B0B0B0 1px, transparent 1px); /* Slightly darker dots */
+        background-size: 20px 20px;
+      }
+      .dark .paper-pattern {
+        background-color: #1a1a2e;
+        background-image: radial-gradient(#334155 1px, transparent 1px);
+      }
+
+      /* Grid Pattern */
+      .grid-pattern {
+        background-color: #f8fafc;
+        background-image: linear-gradient(to right, rgba(0,0,0,0.05) 1px, transparent 1px),
+                          linear-gradient(to bottom, rgba(0,0,0,0.05) 1px, transparent 1px);
+        background-size: 40px 40px;
+      }
+      .dark .grid-pattern {
+        background-color: #111827;
+        background-image: linear-gradient(to right, rgba(255,255,255,0.05) 1px, transparent 1px),
+                          linear-gradient(to bottom, rgba(255,255,255,0.05) 1px, transparent 1px);
+      }
+
+      /* Polka Pattern */
+      .polka-pattern {
+        background-color: #ecfdf5; /* Minty white */
+        background-image: radial-gradient(#99f6e4 2px, transparent 2px);
+        background-size: 30px 30px;
+      }
+      .dark .polka-pattern {
+        background-color: #064e3b;
+        background-image: radial-gradient(#059669 2px, transparent 2px);
+      }
+
+      /* Stripe Pattern */
+      .stripe-pattern {
+        background-color: #fff1f2; /* Light Pink */
+        background-image: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(251, 113, 133, 0.1) 10px, rgba(251, 113, 133, 0.1) 20px);
+      }
+      .dark .stripe-pattern {
+        background-color: #3f1d24;
+        background-image: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255, 255, 255, 0.05) 10px, rgba(255, 255, 255, 0.05) 20px);
+      }
+
+      /* Doodle Pattern */
+      .doodle-pattern {
+        background-color: #fffbeb; /* Creamy yellow base */
+        /* Simple SVG pattern with squiggles and stars */
+        background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M10 10 Q15 5 20 10 T30 10' fill='none' stroke='%23FCA5A5' stroke-width='2'/%3E%3Ccircle cx='50' cy='50' r='3' fill='%2393C5FD'/%3E%3Crect x='80' y='20' width='6' height='6' transform='rotate(20 80 20)' fill='none' stroke='%23FDBA74' stroke-width='2'/%3E%3Cpath d='M10 80 L18 88 M18 80 L10 88' stroke='%23C4B5FD' stroke-width='2'/%3E%3Cpath d='M70 70 Q80 60 90 70' fill='none' stroke='%236EE7B7' stroke-width='2'/%3E%3C/svg%3E");
+        background-size: 100px 100px;
+      }
+      .dark .doodle-pattern {
+        background-color: #1e1b4b;
+        background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M10 10 Q15 5 20 10 T30 10' fill='none' stroke='%23FDA4AF' stroke-width='2' opacity='0.3'/%3E%3Ccircle cx='50' cy='50' r='3' fill='%2360A5FA' opacity='0.3'/%3E%3Crect x='80' y='20' width='6' height='6' transform='rotate(20 80 20)' fill='none' stroke='%23FDBA74' stroke-width='2' opacity='0.3'/%3E%3Cpath d='M10 80 L18 88 M18 80 L10 88' stroke='%23A78BFA' stroke-width='2' opacity='0.3'/%3E%3Cpath d='M70 70 Q80 60 90 70' fill='none' stroke='%2334D399' stroke-width='2' opacity='0.3'/%3E%3C/svg%3E");
+      }
+      
+      .stomp-text {
+         text-shadow: 4px 4px 0px rgba(0,0,0,0.2);
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react": "https://aistudiocdn.com/react@^19.2.1",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.1/",
+    "react/": "https://aistudiocdn.com/react@^19.2.1/",
+    "@google/genai": "https://aistudiocdn.com/@google/genai@^1.31.0",
+    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.555.0",
+    "recharts": "https://aistudiocdn.com/recharts@^3.5.1",
+    "vite": "https://aistudiocdn.com/vite@^7.2.6",
+    "@vitejs/plugin-react": "https://aistudiocdn.com/@vitejs/plugin-react@^5.1.1"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>
