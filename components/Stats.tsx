@@ -47,13 +47,20 @@ export const Stats: React.FC<StatsProps> = ({ data }) => {
     setWeeklyData(weekly as DailyStats[]);
   };
 
-  // Format date for chart in DD/MM/YYYY format
+  // Format date for chart - weekday for X-axis
   const formatDate = (dateStr: string) => {
+    if (!dateStr) return '';
+    const d = new Date(dateStr + 'T00:00:00');
+    return d.toLocaleDateString('en-US', { weekday: 'short' });
+  };
+
+  // Format date for tooltip - DD/MM/YY
+  const formatTooltipDate = (dateStr: string) => {
     if (!dateStr) return '';
     const d = new Date(dateStr + 'T00:00:00');
     const day = String(d.getDate()).padStart(2, '0');
     const month = String(d.getMonth() + 1).padStart(2, '0');
-    const year = d.getFullYear();
+    const year = String(d.getFullYear()).slice(-2);
     return `${day}/${month}/${year}`;
   };
 
@@ -198,7 +205,7 @@ export const Stats: React.FC<StatsProps> = ({ data }) => {
                 <Tooltip 
                   cursor={{ fill: 'transparent' }}
                   contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)', backgroundColor: 'white', color: '#1f2937' }}
-                  labelFormatter={(label) => new Date(label).toLocaleDateString()}
+                  labelFormatter={(label) => formatTooltipDate(label)}
                 />
                 <Bar dataKey="focusMinutes" radius={[4, 4, 0, 0]}>
                   {chartData.map((entry, index) => (
@@ -220,7 +227,7 @@ export const Stats: React.FC<StatsProps> = ({ data }) => {
                 <Tooltip 
                   cursor={{ stroke: '#FFDAB9', strokeWidth: 2 }}
                   contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)', backgroundColor: 'white', color: '#1f2937' }}
-                  labelFormatter={(label) => new Date(label).toLocaleDateString()}
+                  labelFormatter={(label) => formatTooltipDate(label)}
                 />
                 <Line 
                   type="monotone" 
@@ -287,7 +294,7 @@ export const Stats: React.FC<StatsProps> = ({ data }) => {
               <Tooltip 
                 cursor={{ fill: 'transparent' }}
                 contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                labelFormatter={(label) => new Date(label).toLocaleDateString()}
+                labelFormatter={(label) => formatTooltipDate(label)}
               />
               <Bar dataKey="focusMinutes" radius={[4, 4, 0, 0]}>
                 {chartData.map((entry, index) => (
@@ -309,7 +316,7 @@ export const Stats: React.FC<StatsProps> = ({ data }) => {
               <Tooltip 
                 cursor={{ stroke: '#FFDAB9', strokeWidth: 2 }}
                 contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                labelFormatter={(label) => new Date(label).toLocaleDateString()}
+                labelFormatter={(label) => formatTooltipDate(label)}
               />
               <Line 
                 type="monotone" 
