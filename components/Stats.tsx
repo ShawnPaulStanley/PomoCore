@@ -194,7 +194,7 @@ export const Stats: React.FC<StatsProps> = ({ data }) => {
                 />
                 <Tooltip 
                   cursor={{ fill: 'transparent' }}
-                  contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                  contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)', backgroundColor: 'white', color: '#1f2937' }}
                   labelFormatter={(label) => new Date(label).toLocaleDateString()}
                 />
                 <Bar dataKey="focusMinutes" radius={[4, 4, 0, 0]}>
@@ -216,7 +216,7 @@ export const Stats: React.FC<StatsProps> = ({ data }) => {
                 />
                 <Tooltip 
                   cursor={{ stroke: '#FFDAB9', strokeWidth: 2 }}
-                  contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                  contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)', backgroundColor: 'white', color: '#1f2937' }}
                   labelFormatter={(label) => new Date(label).toLocaleDateString()}
                 />
                 <Line 
