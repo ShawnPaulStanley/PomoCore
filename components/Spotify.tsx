@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Music, Plus, Link as LinkIcon, Disc, LogIn, X } from 'lucide-react';
+import { Music, Plus, Link as LinkIcon, Disc, LogIn, RotateCcw } from 'lucide-react';
 import { supabase } from '../services/supabase';
 
 const PRESETS = [
@@ -17,21 +17,21 @@ export const SpotifyPlayer: React.FC = () => {
   const [activePreset, setActivePreset] = useState<string>('Lofi Girl');
   const [showLoginButton, setShowLoginButton] = useState(true);
   const [user, setUser] = useState<any>(null);
+  const [hasClickedLogin, setHasClickedLogin] = useState(false);
 
   useEffect(() => {
+    loadLoginPreference();
+    
     // Check if user is logged in to PomoCore
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
-      if (session?.user) {
-        loadButtonPreference(session.user.id);
-      }
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
-      if (session?.user) {
-        loadButtonPreference(session.user.id);
-      } else {
+      if (!session?.user) {
+        // Reset when user signs out
+        setHasClickedLogin(false);
         setShowLoginButton(true);
       }
     });
@@ -39,31 +39,31 @@ export const SpotifyPlayer: React.FC = () => {
     return () => subscription.unsubscribe();
   }, []);
 
-  const loadButtonPreference = async (userId: string) => {
+  const loadLoginPreference = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
     const { data } = await supabase
       .from('user_preferences')
-      .select('hide_spotify_login')
-      .eq('user_id', userId)
+      .select('spotify_login_clicked')
+      .eq('user_id', user.id)
       .single();
-    
-    if (data) {
-      setShowLoginButton(!data.hide_spotify_login);
+
+    if (data?.spotify_login_clicked) {
+      setHasClickedLogin(true);
+      setShowLoginButton(false);
     }
   };
 
-  const handleHideButton = async () => {
+  const saveLoginPreference = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
 
-    setShowLoginButton(false);
-    
-    // Save preference to Supabase
     await supabase
       .from('user_preferences')
       .upsert({
         user_id: user.id,
-        hide_spotify_login: true
-      }, {
-        onConflict: 'user_id'
+        spotify_login_clicked: true
       });
   };
 
@@ -94,6 +94,10 @@ export const SpotifyPlayer: React.FC = () => {
   };
 
   const handleLogin = () => {
+    setShowLoginButton(false);
+    setHasClickedLogin(true);
+    saveLoginPreference();
+    
     // Opens Spotify login in a popup window
     const width = 450;
     const height = 730;
@@ -104,6 +108,10 @@ export const SpotifyPlayer: React.FC = () => {
       'Spotify Login', 
       `width=${width},height=${height},top=${top},left=${left}`
     );
+  };
+
+  const handleShowLoginButton = () => {
+    setShowLoginButton(true);
   };
 
   return (
@@ -124,8 +132,8 @@ export const SpotifyPlayer: React.FC = () => {
       </div>
 
       {/* Login Helper - Centered */}
-      {showLoginButton && (
-        <div className="flex justify-center items-center gap-2 px-2 -mt-1">
+      {showLoginButton ? (
+        <div className="flex justify-center px-2 -mt-1">
            <button 
              onClick={handleLogin} 
              className="text-[11px] bg-green-500 hover:bg-green-600 text-white px-3 py-1.5 rounded-full transition-colors flex items-center gap-1.5 font-semibold shadow-sm"
@@ -134,15 +142,17 @@ export const SpotifyPlayer: React.FC = () => {
              <LogIn size={12} />
              <span>Login for Full Playback</span>
            </button>
-           {user && (
-             <button
-               onClick={handleHideButton}
-               className="text-[11px] bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-600 dark:text-gray-300 p-1.5 rounded-full transition-colors"
-               title="Hide this button"
-             >
-               <X size={12} />
-             </button>
-           )}
+        </div>
+      ) : hasClickedLogin && user && (
+        <div className="flex justify-center px-2 -mt-1">
+           <button 
+             onClick={handleShowLoginButton} 
+             className="text-[10px] text-gray-400 hover:text-green-500 transition-colors flex items-center gap-1 font-sans opacity-60 hover:opacity-100"
+             title="Show Spotify login button again"
+           >
+             <RotateCcw size={10} />
+             <span>Show Login Button</span>
+           </button>
         </div>
       )}
 
