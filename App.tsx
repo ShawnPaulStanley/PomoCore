@@ -214,64 +214,66 @@ function App() {
         </div>
 
         {/* Right Controls */}
-        <div className="absolute top-6 right-6 flex items-center gap-3 z-40">
-          <button
-            onClick={() => setFocusMode(!focusMode)}
-            className={`flex items-center gap-2 px-3 py-1 rounded-full text-sm font-bold transition-all ${focusMode ? 'bg-pastel-peach text-white shadow-md scale-105' : 'bg-white dark:bg-gray-800 opacity-90 hover:opacity-100 border border-gray-200 dark:border-gray-700'}`}
-          >
-            {focusMode ? <EyeOff size={14} /> : <Eye size={14} />}
-            <span className="hidden md:inline">{focusMode ? 'Exit Focus' : 'Focus Mode'}</span>
-          </button>
-
-          <div className="hidden md:flex items-center gap-2 mr-2 text-sm font-bold opacity-90 bg-white dark:bg-gray-800 px-3 py-1 rounded-full border border-gray-200 dark:border-gray-700">
-            <span>{Math.floor(todayStats.focusMinutes)}m</span>
-            <Flame size={14} className="text-pastel-peach" />
-          </div>
-          
-          {/* Theme Selector */}
-          <div className="relative" ref={themeMenuRef}>
-            <button 
-              onClick={() => setShowThemeMenu(!showThemeMenu)}
-              className={`flex items-center gap-2 px-3 py-1 rounded-full transition-colors ${showThemeMenu ? 'bg-pastel-peach text-white' : 'bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700'}`}
+        <div className="absolute top-6 right-6 flex flex-col items-end gap-3 z-40">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setFocusMode(!focusMode)}
+              className={`flex items-center gap-2 px-3 py-1 rounded-full text-sm font-bold transition-all ${focusMode ? 'bg-pastel-peach text-white shadow-md scale-105' : 'bg-white dark:bg-gray-800 opacity-90 hover:opacity-100 border border-gray-200 dark:border-gray-700'}`}
             >
-              <Palette size={16} />
-              <span className="text-xs font-bold uppercase hidden md:inline">Theme</span>
+              {focusMode ? <EyeOff size={14} /> : <Eye size={14} />}
+              <span className="hidden md:inline">{focusMode ? 'Exit Focus' : 'Focus Mode'}</span>
             </button>
 
-            {showThemeMenu && (
-              <div className="absolute top-full right-0 mt-3 w-72 bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 p-4 z-50 animate-[slideUpFade_0.2s_ease-out]">
-                <div className="flex justify-between items-center mb-3">
-                   <span className="text-xs font-bold uppercase text-gray-500 dark:text-gray-400 tracking-wider">Select Theme</span>
-                   <button onClick={() => setShowThemeMenu(false)} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
-                     <X size={14} />
-                   </button>
+            <div className="hidden md:flex items-center gap-2 mr-2 text-sm font-bold opacity-90 bg-white dark:bg-gray-800 px-3 py-1 rounded-full border border-gray-200 dark:border-gray-700">
+              <span>{Math.floor(todayStats.focusMinutes)}m</span>
+              <Flame size={14} className="text-pastel-peach" />
+            </div>
+            
+            {/* Theme Selector */}
+            <div className="relative" ref={themeMenuRef}>
+              <button 
+                onClick={() => setShowThemeMenu(!showThemeMenu)}
+                className={`flex items-center gap-2 px-3 py-1 rounded-full transition-colors ${showThemeMenu ? 'bg-pastel-peach text-white' : 'bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700'}`}
+              >
+                <Palette size={16} />
+                <span className="text-xs font-bold uppercase hidden md:inline">Theme</span>
+              </button>
+
+              {showThemeMenu && (
+                <div className="absolute top-full right-0 mt-3 w-72 bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 p-4 z-50 animate-[slideUpFade_0.2s_ease-out]">
+                  <div className="flex justify-between items-center mb-3">
+                     <span className="text-xs font-bold uppercase text-gray-500 dark:text-gray-400 tracking-wider">Select Theme</span>
+                     <button onClick={() => setShowThemeMenu(false)} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+                       <X size={14} />
+                     </button>
+                  </div>
+                  <div className="grid grid-cols-3 gap-3 max-h-[300px] overflow-y-auto pr-1">
+                    {Object.values(AppTheme).map((t) => (
+                      <button
+                        key={t}
+                        onClick={() => setTheme(t)}
+                        className={`flex flex-col items-center gap-2 p-2 rounded-xl transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-700 ${theme === t ? 'bg-pastel-peach/10 ring-2 ring-pastel-peach' : ''}`}
+                      >
+                        <div className={`w-8 h-8 rounded-full shadow-inner border border-black/5 dark:border-white/10 ${getThemePreviewStyle(t)} flex items-center justify-center`}>
+                          {theme === t && <Check size={14} className="text-gray-700 dark:text-white drop-shadow-md" />}
+                        </div>
+                        <span className="text-[10px] font-bold uppercase text-gray-600 dark:text-gray-300 truncate w-full text-center">
+                          {t}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
                 </div>
-                <div className="grid grid-cols-3 gap-3 max-h-[300px] overflow-y-auto pr-1">
-                  {Object.values(AppTheme).map((t) => (
-                    <button
-                      key={t}
-                      onClick={() => setTheme(t)}
-                      className={`flex flex-col items-center gap-2 p-2 rounded-xl transition-all duration-200 hover:bg-gray-100 dark:hover:bg-gray-700 ${theme === t ? 'bg-pastel-peach/10 ring-2 ring-pastel-peach' : ''}`}
-                    >
-                      <div className={`w-8 h-8 rounded-full shadow-inner border border-black/5 dark:border-white/10 ${getThemePreviewStyle(t)} flex items-center justify-center`}>
-                        {theme === t && <Check size={14} className="text-gray-700 dark:text-white drop-shadow-md" />}
-                      </div>
-                      <span className="text-[10px] font-bold uppercase text-gray-600 dark:text-gray-300 truncate w-full text-center">
-                        {t}
-                      </span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
+              )}
+            </div>
+            
+            <button 
+              onClick={() => setDarkMode(!darkMode)}
+              className="p-2 rounded-full bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700 transition-colors"
+            >
+              {darkMode ? <Sun size={20} /> : <Moon size={20} />}
+            </button>
           </div>
-          
-          <button 
-            onClick={() => setDarkMode(!darkMode)}
-            className="p-2 rounded-full bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 border border-gray-200 dark:border-gray-700 transition-colors"
-          >
-            {darkMode ? <Sun size={20} /> : <Moon size={20} />}
-          </button>
 
           <Auth />
         </div>
