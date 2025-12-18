@@ -71,6 +71,15 @@ export const Stats: React.FC<StatsProps> = ({ data }) => {
     return `${day}/${month}/${year}`;
   };
 
+  // Format minutes to hours and minutes (e.g., "2h 30m")
+  const formatTime = (minutes: number) => {
+    if (minutes < 60) return `${minutes}m`;
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    if (mins === 0) return `${hours}h`;
+    return `${hours}h ${mins}m`;
+  };
+
   // Use Supabase data if user is logged in, otherwise use localStorage data
   let chartData: any[] = user ? weeklyData : data;
   
@@ -133,8 +142,8 @@ export const Stats: React.FC<StatsProps> = ({ data }) => {
                 <BarChart2 size={18} className="text-pink-500" />
                 <span className="text-xs font-bold uppercase text-gray-600 dark:text-gray-300">Total Time</span>
               </div>
-              <p className="text-3xl font-hand font-bold text-pink-600 dark:text-pink-400">{totalFocusTime}</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400">minutes</p>
+              <p className="text-3xl font-hand font-bold text-pink-600 dark:text-pink-400">{formatTime(totalFocusTime)}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400">focus time</p>
             </div>
           </div>
         </div>
@@ -188,6 +197,7 @@ export const Stats: React.FC<StatsProps> = ({ data }) => {
                   cursor={{ fill: 'transparent' }}
                   contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)', backgroundColor: 'white', color: '#1f2937' }}
                   labelFormatter={(label) => formatTooltipDate(label)}
+                  formatter={(value: any) => [formatTime(value), 'Focus Time']}
                 />
                 <Bar dataKey="focusMinutes" radius={[4, 4, 0, 0]}>
                   {chartData.map((entry, index) => (
@@ -210,6 +220,7 @@ export const Stats: React.FC<StatsProps> = ({ data }) => {
                   cursor={{ stroke: '#FFDAB9', strokeWidth: 2 }}
                   contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)', backgroundColor: 'white', color: '#1f2937' }}
                   labelFormatter={(label) => formatTooltipDate(label)}
+                  formatter={(value: any) => [formatTime(value), 'Focus Time']}
                 />
                 <Line 
                   type="monotone" 
@@ -277,6 +288,7 @@ export const Stats: React.FC<StatsProps> = ({ data }) => {
                 cursor={{ fill: 'transparent' }}
                 contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                 labelFormatter={(label) => formatTooltipDate(label)}
+                formatter={(value: any) => [formatTime(value), 'Focus Time']}
               />
               <Bar dataKey="focusMinutes" radius={[4, 4, 0, 0]}>
                 {chartData.map((entry, index) => (
@@ -299,6 +311,7 @@ export const Stats: React.FC<StatsProps> = ({ data }) => {
                 cursor={{ stroke: '#FFDAB9', strokeWidth: 2 }}
                 contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                 labelFormatter={(label) => formatTooltipDate(label)}
+                formatter={(value: any) => [formatTime(value), 'Focus Time']}
               />
               <Line 
                 type="monotone" 

@@ -28,6 +28,7 @@ export const Timer: React.FC<TimerProps> = ({ onSessionComplete }) => {
   const [showSettings, setShowSettings] = useState(false);
   
   const [endTime, setEndTime] = useState<number | null>(null);
+  const [pomodoroCount, setPomodoroCount] = useState(0); // Track completed focus sessions
 
   const switchMode = (newMode: TimerMode) => {
     setIsActive(false);
@@ -41,9 +42,13 @@ export const Timer: React.FC<TimerProps> = ({ onSessionComplete }) => {
   const handleComplete = useCallback(async () => {
     setIsActive(false);
     setEndTime(null);
+    
+    // Play longer alarm sound (3 times)
     const sound = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3'); 
     sound.volume = 0.5;
     sound.play().catch(() => {});
+    setTimeout(() => sound.play().catch(() => {}), 800);
+    setTimeout(() => sound.play().catch(() => {}), 1600);
     
     if (mode === 'focus') {
       const completedMinutes = initialDuration / 60;
@@ -55,8 +60,46 @@ export const Timer: React.FC<TimerProps> = ({ onSessionComplete }) => {
       } catch (error) {
         console.error('Failed to save session:', error);
       }
+      
+      // Auto-move to break after focus
+      const newCount = pomodoroCount + 1;
+      setPomodoroCount(newCount);
+      
+      if (newCount % 4 === 0) {
+        // After 4th focus session, start long break
+        const newTime = durations.longBreak * 60;
+        setMode('longBreak');
+        setInitialDuration(newTime);
+        setTimeLeft(newTime);
+        setIsActive(true);
+        setEndTime(Date.now() + newTime * 1000);
+      } else {
+        // After 1st-3rd focus session, start short break
+        const newTime = durations.shortBreak * 60;
+        setMode('shortBreak');
+        setInitialDuration(newTime);
+        setTimeLeft(newTime);
+        setIsActive(true);
+        setEndTime(Date.now() + newTime * 1000);
+      }
+    } else if (mode === 'shortBreak') {
+      // After short break, auto-start focus
+      const newTime = durations.focus * 60;
+      setMode('focus');
+      setInitialDuration(newTime);
+      setTimeLeft(newTime);
+      setIsActive(true);
+      setEndTime(Date.now() + newTime * 1000);
+    } else if (mode === 'longBreak') {
+      // After long break, reset to focus but DON'T auto-start
+      setPomodoroCount(0);
+      const newTime = durations.focus * 60;
+      setMode('focus');
+      setInitialDuration(newTime);
+      setTimeLeft(newTime);
+      // Don't set isActive or endTime - wait for user to start
     }
-  }, [mode, initialDuration, onSessionComplete]);
+  }, [mode, initialDuration, onSessionComplete, pomodoroCount, durations]);
 
   const toggleTimer = () => {
     if (isActive) {
@@ -78,8 +121,11 @@ export const Timer: React.FC<TimerProps> = ({ onSessionComplete }) => {
 
         if (diff <= 0) {
           setTimeLeft(0);
-          handleComplete();
           clearInterval(interval);
+          // Use setTimeout to ensure state updates properly
+          setTimeout(() => {
+            handleComplete();
+          }, 100);
         } else {
           setTimeLeft(diff);
         }
